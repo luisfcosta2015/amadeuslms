@@ -297,14 +297,15 @@ class ViewReportView(LoginRequiredMixin, generic.TemplateView):
                 space__id=subject.id)
 
                 #comments count on help posts created by the student
-                interactions[_('Amount of comments on help posts created by the student.')] = Comment.objects\
-                    .filter(post__in = help_posts.filter(user=student),
-                            create_date__range=(init_date, end_date)).count()
+                interactions[_('Amount of comments on help posts created by' + 
+                'the student.')] = Comment.objects.filter(
+                    post__in=help_posts_made_by_user).count()
 
                 #count the amount of comments made by the student on posts made by one of the professors
-                interactions[_('Amount of comments made by the student on teachers help posts.')] = Comment.objects\
-                    .filter(post__in = help_posts.filter(user__in=subject.professor.all()),
-                            create_date__range=(init_date, end_date), user=student).count()
+                interactions[_('Amount of comments made by the student on' + 
+                'teachers help posts.')] = Comment.objects.filter(
+                    post__in=help_posts.filter(user__in=subject.professor.all()),
+                    create_date__range=(init_date, end_date), user=student).count()
 
                  #comments made by the user on other users posts
                 interactions[_('Amount of comments made by the student on other students help posts.')] = Comment\
