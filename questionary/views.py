@@ -96,9 +96,7 @@ class InsideView(LoginRequiredMixin, LogMixin, generic.ListView):
 
                         for row in rows:
                             list_q.append(row[0])
-
                         random.shuffle(list_q)
-
                         q_ids = q_ids + (list_q[0:n_questions])
                 
                 questions = Question.objects.filter(pk__in = q_ids)
