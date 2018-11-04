@@ -347,8 +347,10 @@ class ViewReportView(LoginRequiredMixin, generic.TemplateView):
 
             # VAR08 through VAR_019 of documenttation:
             if len(resources_type_names) > 0:
-                resources_data = self.get_resources_and_tags_data(resources_type_names, tags_id, student, subject,
-                                                                  topics, init_date, end_date)
+                resources_data = self.get_resources_and_tags_data(
+                    resources_type_names, tags_id, student, subject, topics,
+                    init_date, end_date)
+                
                 for key, value in resources_data.items():
                     interactions[key] = value
 
@@ -433,24 +435,24 @@ class ViewReportView(LoginRequiredMixin, generic.TemplateView):
                 tags[i] = new_tags
 
         for i in range(len(resources_types)):
-            original_tags = copy.deepcopy(self.used_tags) #effectiving copy
+            original_tags = copy.deepcopy(self.used_tags)  #effectiving copy
             if isinstance(topics, Topic):
                 if isinstance(tags[i], List):
-                    resources = Resource.objects.select_related(
-                        resources_types[i].lower()).filter(tags__in=tags[i],
-                        topic=topics)
+                    resources = Resource.objects.filter(
+                        _my_subclass=resources_types[i].lower()).filter(
+                            tags__in=tags[i], topic=topics)
                 else:
-                    resources = Resource.objects.select_related(
-                        resources_types[i].lower()).filter(tags__in=[tags[i]],
-                        topic=topics)
+                    resources = Resource.objects.filter(
+                        _my_subclass=resources_types[i].lower()).filter(
+                            tags__in=[tags[i]], topic=topics)
             else: 
                 if isinstance(tags[i], List):
-                    resources = Resource.objects.select_related(
-                        resources_types[i].lower()).filter(tags__in=tags[i],
+                    resources = Resource.objects.filter(
+                        _my_subclass=resources_types[i].lower()).filter(tags__in=tags[i],
                         topic__in=topics)
                 else:
-                    resources = Resource.objects.select_related(
-                        resources_types[i].lower()).filter(tags__in=[tags[i]],
+                    resources = Resource.objects.filter(
+                        _my_subclass=resources_types[i].lower()).filter(tags__in=[tags[i]],
                         topic__in=topics)
             distinct_resources = 0
             total_count = 0
@@ -461,7 +463,6 @@ class ViewReportView(LoginRequiredMixin, generic.TemplateView):
 
             hours_viewed = 0  # youtube video as well as webconference
             for resource in resources:
-
                 if isinstance(topics, Topic):
                     #if it selected only one topic to work with
                     count = Log.objects.filter(
