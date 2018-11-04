@@ -322,7 +322,6 @@ class ViewReportView(LoginRequiredMixin, generic.TemplateView):
                 interactions[_('Number of help posts created by the user that the teacher commented on.')] = help_posts\
                     .filter(user=student, id__in=help_posts_ids).count()
 
-                comments_by_others = Comment.objects.filter(user__in=subject.students.exclude(id=student.id))
                 help_posts_ids = []
                 for comment in comments_by_teacher:
                     help_posts_ids.append(comment.post.id)
@@ -398,7 +397,9 @@ class ViewReportView(LoginRequiredMixin, generic.TemplateView):
 
         return row_data, header
 
-    def get_resources_and_tags_data(self, resources_types, tags, student, subject, topics, init_date, end_date):
+    def get_resources_and_tags_data(self, resources_types, tags, student, 
+        subject, topics, init_date, end_date):
+        
         data = OrderedDict()
 
         new_tags = []  # tags will be replaced by this variable
@@ -577,31 +578,31 @@ class ViewReportView(LoginRequiredMixin, generic.TemplateView):
 
     def get_messages_data(self, subject, student):
         data = OrderedDict()
-        messages_sent_to_other_students = 0
         distinct_students = 0
-
+        
         for other_student in subject.students.exclude(id=student.id):
-            conversations_with_other = Conversation.objects.filter(Q(user_one=student) & Q(user_two=other_student) |
-                                                                   Q(user_one=other_student) & Q(user_two=student))
-            messages_sent_other = TalkMessages.objects.filter(talk__in=conversations_with_other, user=student,
-                                                              subject=subject)
-            messages_received_other = TalkMessages.objects.filter(talk__in=conversations_with_other, user=other_student,
-                                                                  subject=subject)
+            conversations_with_other = Conversation.objects.filter(
+                Q(user_one=student) & Q(user_two=other_student) |
+                Q(user_one=other_student) & Q(user_two=student))
+            
+            messages_sent_other = TalkMessages.objects.filter(
+                talk__in=conversations_with_other, user=student, subject=subject)
+            
+            messages_received_other = TalkMessages.objects.filter(
+                talk__in=conversations_with_other, user=other_student, subject=subject)
 
-            if data.get(_(" amount of messages sent to other students")):
-                data[_(" amount of messages sent to other students")] = messages_sent_other.count() \
-                                                                        + data.get(
-                    _(" amount of messages sent to other students"))
+            # key_op is a value to improve readibility
+            key_op = _(" amount of messages sent to other students")
+            if data.get(key_op):
+                data[key_op] = messages_sent_other.count() + data.get(key_op)
             else:
-                data[_(" amount of messages sent to other students")] = messages_sent_other.count()
+                data[key_op] = messages_sent_other.count()
 
-            if data.get(_("amount of messages received from other students")):
-                data[_("amount of messages received from other students")] = messages_received_other.count()\
-                                                                             + data.get(
-                    _("amount of messages received from other students"))
+            key_op = _("amount of messages received from other students")
+            if data.get(key_op):
+                data[key_op] = messages_received_other.count() + data.get(key_op)
             else:
-
-                data[_("amount of messages received from other students")] = messages_received_other.count()
+                data[key_op] = messages_received_other.count()
 
             #check whether the other started a conversation or not
             if messages_sent_other.count() > 0:
@@ -619,18 +620,19 @@ class ViewReportView(LoginRequiredMixin, generic.TemplateView):
 
             messages_received_from_professors = TalkMessages.objects.filter(talk__in=conversations_with_professor,
                                                                             user=professor, subject=subject)
-            if data.get(_("amount messages sent to professors")):
-                data[_("amount messages sent to professors")] = messages_sent_to_professors.count() \
-                                                                + data.get(_("amount messages sent to professors"))
+            
+            key_op = _("amount messages sent to professors")
+            if data.get(key_op):
+                data[key_op] = messages_sent_to_professors.count() + \
+                    data.get(key_op)
             else:
-                data[_("amount messages sent to professors")] = messages_sent_to_professors.count()
+                data[key_op] = messages_sent_to_professors.count()
 
-            if data.get(_("amount of messages received from professors")):
-                data[_("amount of messages received from professors")] = messages_received_from_professors.count() \
-                                                                         + data.get(
-                    _("amount of messages received from professors"))
+            key_op = _("amount of messages received from professors")
+            if data.get(key_op):
+                data[key_op] = messages_received_from_professors.count() + data.get(key_op)
             else:
-                data[_("amount of messages received from professors")] = messages_received_from_professors.count() 
+                data[key_op] = messages_received_from_professors.count()
 
         return data
 
@@ -674,8 +676,6 @@ def get_resources(request):
 This function returns all the tags associated 
 with a resource that is of the type of of the resource_class_name provided.
 """
-
-
 def get_tags(request):
     resource_type = request.GET['resource_class_name']
     subject = Subject.objects.get(id=request.GET['subject_id'])
