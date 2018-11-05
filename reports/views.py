@@ -36,6 +36,7 @@ from log.models import Log
 from mural.models import Comment, MuralVisualizations, SubjectPost
 from subjects.models import Subject, Tag
 from topics.models import Resource, Topic
+from questionary.reports import get_questionary_user_report
 
 from .forms import (BaseResourceAndTagFormset, CreateInteractionReportForm,
                     ResourceAndTagForm)
@@ -279,7 +280,7 @@ class ViewReportView(LoginRequiredMixin, generic.TemplateView):
         for student in students:
             row_data[student.id] = []
             
-            if len(student.social_name) > 0:
+            if student.social_name:
                 row_data[student.id].append(student.social_name)
             else:
                 row_data[student.id].append(student.username)
