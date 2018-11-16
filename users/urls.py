@@ -30,6 +30,4 @@ urlpatterns = [
 	url(r'^edit_profile/$', views.UpdateProfile.as_view(), name = 'edit_profile'),
 	url(r'^change_pass/$', views.ChangePassView.as_view(), name='change_pass'),
 	url(r'^remove_account/$', views.DeleteView.as_view(), name='remove_acc'),
-
-	
 ]
